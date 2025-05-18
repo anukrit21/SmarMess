@@ -1,0 +1,91 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      group-id: test-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.demoApp.*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  resources:
+    static-locations: classpath:/static/, classpath:/ml/
+  mail:
+    host: localhost
+    port: 1025
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+eureka:
+  client:
+    enabled: false
+
+spring.cloud.config:
+  enabled: false
+
+app:
+  jwt:
+    secret: testSecretKey1234567890123456789012345678901234567890
+    expiration: 86400000
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:8080
+  minio:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+  frontend-url: http://localhost:3000
+
+mess:
+  recommendation:
+    enabled: true
+    ml-files:
+      mess-master: ml/mess_master.csv
+      menu-mess: ml/menu_mess.csv
+      ratings: ml/updated_dataset.csv
+    default-category: All
+    default-cuisine: All
+    min-score-threshold: 3.0
+  pagination:
+    default-page-size: 20
+    max-page-size: 100
+  kafka:
+    topics:
+      mess-events: mess-events
+      menu-updates: menu-updates
+  cache:
+    menu-ttl: 3600
+
+logging:
+  level:
+    com.demoApp.mess: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
+    org.springframework.kafka: INFO
+    org.springframework.security: DEBUG 

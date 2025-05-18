@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Subscription Confirmation</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Subscription Confirmation</h2>
+        <p>Hello <span th:text="${name}">User</span>,</p>
+        <p>Thank you for subscribing to <span th:text="${subscriptionName}">Subscription</span> at <span th:text="${messName}">Mess</span>!</p>
+        <p>Your subscription details:</p>
+        <ul>
+            <li>Subscription: <span th:text="${subscriptionName}">Subscription</span></li>
+            <li>Mess: <span th:text="${messName}">Mess</span></li>
+        </ul>
+        <p>You can manage your subscription and view your delivery schedule by visiting your account dashboard.</p>
+        <p>
+            <a th:href="${frontendUrl}/subscriptions" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                View Subscription
+            </a>
+        </p>
+        <p>If you have any questions about your subscription, please don't hesitate to contact us.</p>
+        <p>Best regards,<br>The DemoApp Team</p>
+    </div>
+</body>
+</html> 

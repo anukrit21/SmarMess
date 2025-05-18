@@ -1,0 +1,138 @@
+spring:
+  application:
+    name: admin-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    config:
+      fail-fast: false
+      retry:
+        initial-interval: 1500
+        max-attempts: 3
+        max-interval: 3000
+  # Fallback configurations
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demoapp_admin
+    username: postgres
+    password: Nut@n803212
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    consumer:
+      group-id: admin-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.demoApp.*
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: postgres
+    password: Nut@n803212
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  webflux:
+    base-path: /admin
+  security:
+    enabled: false
+    basic:
+      enabled: false
+    require-ssl: false
+
+server:
+  port: 8774
+  servlet:
+    context-path: /admin
+  error:
+    include-message: always
+    include-binding-errors: always
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true
+    hostname: ${spring.application.name}
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 5
+  server:
+    enable-self-preservation: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      adminService:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      adminService:
+        maxAttempts: 3
+        waitDuration: 1000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ZGVtb0FwcFNlY3JldEtleTEyMzQ1Njc4OTAxMjM0NTY3ODkw}
+    expiration: ${JWT_EXPIRATION:86400000}
+  admin:
+    default-page-size: 20
+    max-page-size: 100
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    com.demoApp.admin: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.cloud: DEBUG
+    org.springframework.boot: DEBUG 

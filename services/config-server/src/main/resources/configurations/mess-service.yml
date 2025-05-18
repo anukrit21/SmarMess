@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: mess-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demoapp_mess
+    username: postgres
+    password: Nut@n803212
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: mess-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.demoApp.*
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  cloud:
+    config:
+      enabled: true
+      retry:
+        initial-interval: 1000
+        max-interval: 2000
+        max-attempts: 5
+        multiplier: 1.1
+
+server:
+  port: 8769
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+app:
+  image:
+    storage-path: ./mess-images
+    allowed-types: jpg,jpeg,png
+    max-size: 5MB
+  rating:
+    min: 1
+    max: 5
+  cache:
+    menu-ttl: 1800
+    reviews-ttl: 3600 

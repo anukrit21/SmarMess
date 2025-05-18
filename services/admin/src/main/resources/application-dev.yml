@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  kafka:
+    bootstrap-servers: localhost:9092
+  datasource:
+    url: jdbc:postgresql://localhost:5433/demoapp_admin
+    username: postgres
+    password: Nut@n803212
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework: DEBUG
+    com.demoApp: DEBUG 

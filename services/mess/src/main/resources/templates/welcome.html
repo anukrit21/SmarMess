@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to DemoApp</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Welcome to DemoApp!</h2>
+        <p>Hello <span th:text="${name}">User</span>,</p>
+        <p>Thank you for joining DemoApp! We're excited to have you on board.</p>
+        <p>You can now:</p>
+        <ul>
+            <li>Browse and order from various mess services</li>
+            <li>Subscribe to your favorite mess services</li>
+            <li>Track your orders and deliveries</li>
+            <li>Manage your profile and preferences</li>
+        </ul>
+        <p>
+            <a th:href="${frontendUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                Get Started
+            </a>
+        </p>
+        <p>If you have any questions, feel free to contact our support team.</p>
+        <p>Best regards,<br>The DemoApp Team</p>
+    </div>
+</body>
+</html> 

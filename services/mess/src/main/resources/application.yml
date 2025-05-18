@@ -1,0 +1,204 @@
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+
+# The following environment variables MUST be set for email functionality:
+# MAIL_USERNAME: Your email username (e.g., Gmail address)
+# MAIL_PASSWORD: Your email password or app password
+
+# app: block removed from here to prevent duplicate key error.
+# The correct 'app:' block with all properties is defined below, starting at line 102.
+  application:
+    name: mess-service
+  main:
+    allow-bean-definition-overriding: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:dummy_email@gmail.com}
+    password: ${MAIL_PASSWORD:dummy_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  cloud:
+    config:
+      enabled: false
+      fail-fast: true
+      import-check:
+        enabled: false
+      validate-bootstrap: false
+      retry:
+        initial-interval: 1500
+        max-attempts: 10000
+        max-interval: 1000
+    compatibility-verifier:
+      enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demoapp_mess
+    username: postgres
+    password: Nut@n803212
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: mess-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.demoApp.*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.demoApp.mess.dto.MessEvent
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.use.type.headers: false
+  resources:
+    static-locations: classpath:/static/, classpath:/ml/
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8769
+  error:
+    include-message: always
+    include-binding-errors: always
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: ${spring.application.name}
+
+app:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    exposed-headers: "Authorization"
+    allow-credentials: true
+    max-age: 3600
+  frontend-url: http://localhost:3000
+  minio:
+    enabled: true
+    endpoint: http://localhost:9000
+    access-key: anukritsharma
+    secret-key: anukrit@21
+    bucket: mess-images
+    region: us-east-1
+    secure: false
+    connect-timeout: 10000
+    write-timeout: 10000
+    read-timeout: 10000
+  file-storage:
+    upload-dir: uploads
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      messService:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        registerHealthIndicator: true
+  retry:
+    instances:
+      messService:
+        maxAttempts: 3
+        waitDuration: 1000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  ratelimiter:
+    instances:
+      messService:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+      validate-group-membership: false
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+    kafka:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.demoApp.mess: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
+    org.springframework.jdbc.core: TRACE
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKey12345678901234567890}
+  expiration: 86400000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+mess:
+  pagination:
+    default-page-size: 20
+    max-page-size: 100
+  kafka:
+    topics:
+      mess-events: mess-events
+      menu-updates: menu-updates
+  cache:
+    menu-ttl: 3600 # 1 hour in seconds
+  recommendation:
+    enabled: true
+    data:
+      mess-file: data/mess_ratings.csv
+      menu-file: data/menu_ratings.csv
+    min-score: 3.5

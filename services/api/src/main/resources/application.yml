@@ -1,0 +1,111 @@
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: api-gateway
+  cloud:
+    config:
+      enabled: false
+      uri: http://localhost:8888
+      fail-fast: false
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+        max-interval: 2000
+        multiplier: 1.1
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost:3000"
+              - "http://localhost:5000"
+              - "http://localhost:8000"
+              - "http://localhost:5500"
+              - "http://localhost:8080"
+              - "http://localhost:8081"
+              - "http://localhost:*"
+              - "http://127.0.0.1:*"
+              - "${FRONTEND_URL:http://localhost:5000}"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+        - id: auth-service
+          uri: lb://authentication-service
+          predicates:
+            - Path=/api/auth/**
+        - id: menu-service
+          uri: lb://menu-service
+          predicates:
+            - Path=/api/menu/**
+        - id: otp-service
+          uri: lb://otp-service
+          predicates:
+            - Path=/api/otp/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+        - id: delivery-service
+          uri: lb://delivery-service
+          predicates:
+            - Path=/api/delivery/**
+        - id: mess-service
+          uri: lb://mess-service
+          predicates:
+            - Path=/api/mess/**
+        - id: owner-service
+          uri: lb://owner-service
+          predicates:
+            - Path=/api/owners/**
+        - id: subscription-service
+          uri: lb://subscription-service
+          predicates:
+            - Path=/api/subscriptions/**
+        - id: campus-service
+          uri: lb://campus-service
+          predicates:
+            - Path=/api/v1/campuses/**
+          filters:
+            - RewritePath=/api/v1/campuses/(?<segment>.*), /api/v1/campuses/$\{segment}
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
+  main:
+    web-application-type: reactive
+
+server:
+  port: 8765
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+

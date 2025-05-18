@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_REPO_URI:https://github.com/your-org/your-config-repo}
+          default-label: ${CONFIG_REPO_BRANCH:main}
+          search-paths: ${CONFIG_REPO_SEARCH_PATHS:configurations}
+          clone-on-start: true
+          timeout: 10
+          basedir: ${CONFIG_REPO_BASEDIR:./config-repo}
+    compatibility-verifier:
+      enabled: false
+
+server:
+  port: 8888
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# Kafka common configuration
+kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    group-id: ${spring.application.name}-group
+    auto-offset-reset: earliest
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      spring.json.trusted.packages: com.demoApp.*
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      default:
+        maxAttempts: 3
+        waitDuration: 1000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    docExpansion: none
+
+logging:
+  level:
+    org.springframework.cloud.config: INFO
+    org.springframework.boot.context.config: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.demoApp: INFO
+    org.springframework.web: INFO

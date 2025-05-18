@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS otps (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    otp_type VARCHAR(50) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS otp_attempts (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    attempt_count INTEGER DEFAULT 0,
+    last_attempt_at TIMESTAMP,
+    is_blocked BOOLEAN DEFAULT false,
+    blocked_until TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 

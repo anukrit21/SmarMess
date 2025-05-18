@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+app:
+  minio:
+    enabled: false
+    endpoint: http://localhost:9000
+    access-key: test-access-key
+    secret-key: test-secret-key
+    bucket: test-bucket
+    region: us-east-1
+    secure: false
+    connect-timeout: 1000
+    write-timeout: 1000
+    read-timeout: 1000
+
+logging:
+  level:
+    root: INFO
+    com.demoApp.mess: DEBUG 
